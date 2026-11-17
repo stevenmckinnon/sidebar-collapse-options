@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Collapsed Sidebar Options</title>
+<style>
+:root{
+  /* layout: stacked option cards, two-up on wide screens; mock frames keep the product's light look */
+  --bg:#e8ebed; --fg:#1d2730; --sub:#5d6973;
+  --blue:#2d87b7; --blue-d:#236d95; --soft:#c5e2ee; --panel:#f2f3f3; --line:#d4d8db;
+  --ink:#1d2730; --m2:#68747e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--font-sans,"Open Sans","Segoe UI",system-ui,sans-serif)}
+main{max-width:1320px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:22px;margin:0 0 6px;text-wrap:balance}
+section{min-width:0}
+@media(max-width:520px){.notes{grid-template-columns:1fr}.frame .grid{grid-template-columns:1fr}.frame .grid i:nth-child(n+2){display:none}}
+.intro{color:var(--sub);margin:0 0 24px;max-width:70ch}
+.opts{display:grid;gap:28px}
+@media(min-width:1100px){.opts{grid-template-columns:1fr 1fr}}
+section h2{font-size:16px;margin:0 0 2px}
+section h2 em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--blue);color:#fff;border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+section>p{margin:0 0 10px;color:var(--sub)}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;font-size:13px}
+.notes b{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);margin-bottom:2px}
+.notes ul{margin:0;padding-left:16px}
+
+/* mock app */
+.frame{color:var(--ink);display:flex;height:470px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.side{width:244px;flex:none;background:var(--panel);border-right:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:8px;overflow:auto}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700;font-size:13px;padding:2px 2px 8px;border-bottom:1px solid var(--line)}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;height:32px;border:1px solid #8b959d;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.06em;background:#fff;flex:1;white-space:nowrap}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;flex:none}
+.row{display:flex;gap:6px}
+.row.sm{font-size:10.5px;font-weight:700;letter-spacing:.05em;justify-content:space-between;padding:4px 2px 8px;border-bottom:1px solid var(--line)}
+.row.sm span{display:flex;align-items:center;gap:3px}
+.row.sm svg{width:14px;height:14px}
+.lbl{font-size:12px;font-weight:600;color:var(--m2);padding:2px 6px 0}
+
+.tree{display:flex;flex-direction:column;gap:1px}
+.pg{display:block;width:100%;text-align:left;padding:6px 10px;border-radius:4px;font-size:13px}
+.pg:hover{background:#e4e8ea}
+.pg.on{background:var(--soft);font-weight:700}
+.gh{display:flex;gap:8px;align-items:baseline;font-size:12px;font-weight:700;padding:8px 6px 2px;margin-top:4px;border-top:1px solid var(--line)}
+.gh span{font-weight:400;color:var(--m2)}
+.gh~.pg{padding-left:20px}
+.add{color:var(--blue-d);font-weight:600;font-size:12px;text-align:left;padding:8px 10px 4px}
+
+.rail{width:52px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0}
+.rb{width:34px;height:34px;border-radius:5px;display:grid;place-items:center;position:relative;color:#2a343c}
+.rb:hover{background:#e0e5e8}
+.rb.fill{background:var(--blue);color:#fff}
+.rb.out{border:1px solid #8b959d;background:#fff}
+.rb.on{background:var(--soft);color:var(--blue-d)}
+.badge{position:absolute;top:-3px;right:-3px;min-width:15px;height:15px;border-radius:8px;background:var(--blue);color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;padding:0 3px}
+.hr{width:30px;height:1px;background:var(--line);margin:4px 0}
+
+.flywrap{position:relative}
+.fly{display:none;position:absolute;left:100%;top:-8px;padding-left:12px;z-index:5}
+.fly.on,.hov:hover .fly{display:block}
+.flybox{background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(20,35,50,.18);min-width:200px;padding:6px}
+.flybox .gh:first-child{border-top:0;margin-top:0;padding-top:4px}
+.flybox h4{margin:0;padding:4px 8px 6px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--m2)}
+
+.chip{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;background:#fff;border:1px solid var(--line);position:relative}
+.chip:hover{border-color:#8b959d}
+.chip.on{background:var(--soft);border-color:var(--blue);color:var(--blue-d)}
+.chip small{position:absolute;bottom:-2px;right:-2px;background:var(--panel);border-radius:6px;font-size:9px;font-weight:600;color:var(--m2);padding:0 3px;line-height:12px}
+
+.railwrap{position:relative;display:flex;flex:none}
+.peek{position:absolute;inset:0 auto 0 0;z-index:5;display:flex;visibility:hidden;opacity:0;transform:translateX(-10px);transition:opacity .14s,transform .14s,visibility 0s .14s;box-shadow:8px 0 28px rgba(20,35,50,.2)}
+.railwrap:hover .peek,.railwrap:focus-within .peek{visibility:visible;opacity:1;transform:none;transition-delay:.12s,.12s,.12s}
+.mm{display:flex;flex-direction:column;align-items:center;gap:9px;padding-top:4px}
+.mmg{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mmg i{width:6px;height:6px;border-radius:3px;background:#b3bcc3}
+.mmg i.on{width:18px;background:var(--blue)}
+
+.canvas{flex:1;min-width:0;display:flex;flex-direction:column;background:#fafbfb}
+.chead{height:44px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line);background:#fff;font-size:14px;position:relative}
+.chead .m{color:var(--m2)}
+.grid{flex:1;display:grid;grid-template-columns:1.4fr 1fr;grid-template-rows:1fr 1fr;gap:10px;padding:12px}
+.grid i{background:#fff;border:1px solid var(--line);border-radius:6px;background-image:linear-gradient(#eef0f1,#eef0f1);background-size:40% 8px;background-position:12px 12px;background-repeat:no-repeat}
+.grid i:first-child{grid-row:span 2}
+.sw{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--line);border-radius:5px;background:#fff}
+.sw:hover{border-color:#8b959d}
+.sw svg{width:14px;height:14px}
+.step{width:26px;height:26px;border-radius:4px;display:grid;place-items:center;color:var(--m2)}
+.step:hover{background:#eceff1}
+.step svg{width:15px;height:15px}
+.pos{color:var(--m2);font-size:12px;margin-left:auto}
+.menu{display:none;position:absolute;top:40px;left:14px;z-index:5}
+.menu.on{display:block}
+
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181b; --fg:#e8ecef; --sub:#9aa6b0; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14181b; --fg:#e8ecef; --sub:#9aa6b0; color-scheme:dark}
+</style>
+</head>
+<body>
+
+<main>
+<h1>Collapsed sidebar: four ways to handle pages</h1>
+<p class="intro">Each mock is live. It starts collapsed; use the panel icon at the top of the rail to expand it, and click pages to switch. The truncated labels ("Overv…", "Positi…") are gone in all four, because a 52px rail can't hold a readable page name.</p>
+
+<div class="opts">
+<section>
+  <h2>A. One Pages button, full list in a flyout <em>My pick</em></h2>
+  <p>The rail shows a single pages button. Clicking it opens the complete grouped list at full width.</p>
+  <div class="demo" data-variant="a"></div>
+  <div class="notes">
+    <div><b>Good</b><ul><li>Rail height stays fixed however many pages exist</li><li>Full names and groups, nothing abbreviated</li><li>Works with keyboard and touch</li></ul></div>
+    <div><b>Watch out</b><ul><li>Switching pages is two clicks</li><li>Current page name is only visible in the canvas header</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>B. One chip per group</h2>
+  <p>Each group becomes a two-letter chip with a page count. Hover or click a chip to see its pages.</p>
+  <div class="demo" data-variant="b"></div>
+  <div class="notes">
+    <div><b>Good</b><ul><li>Group structure stays visible when collapsed</li><li>The chip for the current group is highlighted</li><li>Shorter flyouts than A</li></ul></div>
+    <div><b>Watch out</b><ul><li>Initials collide ("Analytics" and "Admin")</li><li>Rail grows with the number of groups</li><li>Needs a fallback for ungrouped pages (the page-icon chip)</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>C. Hover to peek</h2>
+  <p>The rail shows a dot per page as a position marker. Hovering the rail slides the full sidebar over the canvas without moving the layout.</p>
+  <div class="demo" data-variant="c"></div>
+  <div class="notes">
+    <div><b>Good</b><ul><li>No second design to learn; collapsed is the same sidebar</li><li>Fastest with a mouse: move, click, leave</li><li>Dots show where you are and how big the report is</li></ul></div>
+    <div><b>Watch out</b><ul><li>Opens by accident when the pointer crosses the rail to reach an action icon</li><li>Needs a tap alternative on touch screens</li><li>Covers the left edge of the canvas while open</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>D. Move page switching to the canvas header</h2>
+  <p>The rail holds actions only. A switcher in the canvas header shows the current group and page, with previous and next.</p>
+  <div class="demo" data-variant="d"></div>
+  <div class="notes">
+    <div><b>Good</b><ul><li>Current page name is always visible</li><li>Previous and next make stepping through a report one click</li><li>Simplest rail of the four</li></ul></div>
+    <div><b>Watch out</b><ul><li>Page navigation lives in two places depending on sidebar state</li><li>Takes a row of canvas height if there is no header today</li></ul></div>
+  </div>
+</section>
+</div>
+</main>
+
+<script>
+const P={
+ panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M16 10l-2 2 2 2"/>',
+ save:'<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ spark:'<path d="M10 4l1.6 4.4L16 10l-4.4 1.6L10 16l-1.6-4.4L4 10l4.4-1.6zM18 14l.8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8z"/>',
+ filter:'<path d="M4 5h16l-6 7v6l-4 2v-8z" fill="currentColor"/>',
+ down:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+ reload:'<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>',
+ pages:'<path d="M8 3h9l3 3v11H8z"/><path d="M8 7H4v14h12v-4"/>',
+ chev:'<path d="M6 9l6 6 6-6"/>',
+ left:'<path d="M15 6l-6 6 6 6"/>',
+ right:'<path d="M9 6l6 6-6 6"/>'
+};
+const ic=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+const D={loose:['Overview'],groups:[{n:'Analytics',p:['Positions','Exposures','Stress Tests']},{n:'Admin',p:['Reports','Audit Log']}]};
+const ALL=[...D.loose,...D.groups.flatMap(g=>g.p)];
+const groupOf=p=>D.groups.find(g=>g.p.includes(p));
+const S={};
+
+const pg=(p,s)=>`<button class="pg ${p===s.page?'on':''}" data-act="go" data-p="${p}">${p}</button>`;
+const tree=s=>`<div class="tree">${D.loose.map(p=>pg(p,s)).join('')}${D.groups.map(g=>
+  `<div class="gh">${g.n}<span>${g.p.length} pages</span></div>${g.p.map(p=>pg(p,s)).join('')}`).join('')}
+  <button class="add">+ Add page</button></div>`;
+
+const side=(s,pinLabel)=>`<aside class="side">
+  <div class="shead">Sample Report<button class="rb" data-act="toggle" title="${pinLabel}" aria-label="${pinLabel}">${ic('panel')}</button></div>
+  <button class="btn primary">${ic('save')}SAVE</button>
+  <div class="row"><button class="btn">+ ADD WIDGET</button><button class="btn">${ic('spark')}AI CHAT</button></div>
+  <div class="row sm"><span>${ic('filter')}FILTERS</span><span>${ic('down')}EXPORT</span><span>ACTIONS${ic('chev')}</span></div>
+  <div class="lbl">Pages</div>${tree(s)}</aside>`;
+
+const actions=`
+  <button class="rb fill" title="Save">${ic('save')}</button>
+  <button class="rb out" title="Add widget">${ic('plus')}</button>
+  <button class="rb out" title="AI chat">${ic('spark')}</button>
+  <button class="rb" title="Filters">${ic('filter')}<span class="badge">1</span></button>
+  <button class="rb" title="Export">${ic('down')}</button>
+  <button class="rb" title="Reload all data">${ic('reload')}</button>`;
+const toggleBtn=`<button class="rb" data-act="toggle" title="Expand sidebar" aria-label="Expand sidebar">${ic('panel')}</button>`;
+
+function railPages(v,s){
+  if(v==='a') return `<div class="hr"></div><div class="flywrap">
+    <button class="rb ${s.fly?'on':''}" data-act="fly" data-f="pages" title="Pages" aria-label="Pages">${ic('pages')}<span class="badge">${ALL.length}</span></button>
+    <div class="fly ${s.fly?'on':''}"><div class="flybox"><h4>Pages</h4>${tree(s)}</div></div></div>`;
+  if(v==='b'){
+    const sets=[{n:'Pages',p:D.loose,label:ic('pages')},...D.groups.map(g=>({n:g.n,p:g.p,label:g.n.slice(0,2)}))];
+    return `<div class="hr"></div>`+sets.map(g=>`<div class="flywrap hov">
+      <button class="chip ${g.p.includes(s.page)?'on':''}" data-act="fly" data-f="${g.n}" aria-label="${g.n}">${g.label}<small>${g.p.length}</small></button>
+      <div class="fly ${s.fly===g.n?'on':''}"><div class="flybox"><h4>${g.n}</h4><div class="tree">${g.p.map(p=>pg(p,s)).join('')}</div></div></div></div>`).join('')
+      +`<button class="rb" title="Add page or group">${ic('plus')}</button>`;
+  }
+  if(v==='c') return `<div class="hr"></div><div class="mm">${[D.loose,...D.groups.map(g=>g.p)].map(ps=>
+    `<div class="mmg">${ps.map(p=>`<i class="${p===s.page?'on':''}"></i>`).join('')}</div>`).join('')}</div>`;
+  return '';
+}
+
+function canvas(v,s){
+  const g=groupOf(s.page), i=ALL.indexOf(s.page);
+  const crumb=`${g?`<span class="m">${g.n} /</span>`:''}<b>${s.page}</b>`;
+  const head=v==='d'&&!s.open
+    ? `<button class="step" data-act="step" data-d="-1" aria-label="Previous page">${ic('left')}</button>
+       <button class="sw" data-act="fly" data-f="menu">${crumb}${ic('chev')}</button>
+       <button class="step" data-act="step" data-d="1" aria-label="Next page">${ic('right')}</button>
+       <span class="pos">${i+1} of ${ALL.length}</span>
+       <div class="menu fly ${s.fly?'on':''}" style="padding:0"><div class="flybox">${tree(s)}</div></div>`
+    : crumb;
+  return `<div class="canvas"><div class="chead">${head}</div><div class="grid"><i></i><i></i><i></i></div></div>`;
+}
+
+function render(v){
+  const s=S[v], el=document.querySelector(`.demo[data-variant="${v}"]`);
+  let left;
+  if(s.open) left=side(s,'Collapse sidebar');
+  else{
+    const rail=`<nav class="rail" ${v==='c'?'tabindex="0"':''}>${v==='c'?`<span class="rb">${ic('panel')}</span>`:toggleBtn}${actions}${railPages(v,s)}</nav>`;
+    left=v==='c'?`<div class="railwrap">${rail}<div class="peek">${side(s,'Pin sidebar open')}</div></div>`:rail;
+  }
+  el.innerHTML=`<div class="frame">${left}${canvas(v,s)}</div>`;
+}
+
+document.querySelectorAll('.demo').forEach((el,i)=>{
+  S[el.dataset.variant]={open:false,fly:null,page:ALL[[0,2,4,1][i]]};
+  render(el.dataset.variant);
+});
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]'), d=e.target.closest('.demo'), v=d&&d.dataset.variant;
+  if(!t&&e.target.closest('.fly')) return;
+  for(const k in S){
+    const s=S[k];
+    if(k===v&&t){
+      const a=t.dataset.act;
+      if(a==='toggle'){s.open=!s.open;s.fly=null}
+      else if(a==='go'){s.page=t.dataset.p;s.fly=null}
+      else if(a==='fly'){s.fly=s.fly===t.dataset.f?null:t.dataset.f}
+      else if(a==='step'){s.page=ALL[(ALL.indexOf(s.page)+ +t.dataset.d+ALL.length)%ALL.length];s.fly=null}
+      render(k);
+    }else if(s.fly){s.fly=null;render(k)}
+  }
+});
+</script>
+
+</body>
+</html>
