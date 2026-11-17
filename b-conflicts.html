@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Group Chip Labels</title>
+<style>
+:root{
+  /* layout: editable group list on top, four live rails side by side underneath */
+  --blue:#2d87b7; --blue-d:#236d95; --soft:#c5e2ee; --panel:#f2f3f3; --line:#d4d8db;
+  --ink:#1d2730; --m2:#68747e; --bad:#c23b3b; --bad-bg:#fbe3e3; --warn:#9a5b06; --warn-bg:#fcefd9; --ok:#21794f; --ok-bg:#dcf1e5;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page-bg,#e8ebed);color:var(--foreground,#1d2730);font:14px/1.45 "Open Sans","Segoe UI",system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+h1{font-size:22px;margin:0;text-wrap:balance}
+.sub{color:var(--muted-foreground,#5d6973);margin:4px 0 0;max-width:74ch}
+.sub a{color:inherit}
+h2{font-size:15px;margin:0 0 4px}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.card{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card p{margin:0 0 10px;color:var(--m2);font-size:13px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--m2);text-align:left;font-weight:700;padding:0 6px 6px}
+td{padding:5px 6px;vertical-align:middle;border-top:1px solid #eceff1}
+input,select{font:inherit;color:var(--ink);background:#fff;border:1px solid #b9c1c7;border-radius:4px;padding:5px 8px;width:100%}
+input:disabled{background:#f1f3f4;color:var(--m2)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+td.lab{width:92px} td.icn{width:130px} td.st{width:150px} td.x{width:36px}
+.warn{font-size:12px;color:var(--bad)}
+.rm{color:var(--m2);width:28px;height:28px;border-radius:4px;display:grid;place-items:center}
+.rm:hover{background:#eef1f3}
+.addg{color:var(--blue-d);font-weight:600;font-size:13px;margin-top:10px}
+
+.cols{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.col{min-width:0;display:flex;flex-direction:column;gap:8px}
+.col h3{margin:0;font-size:14px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.col p{margin:0;font-size:13px;color:var(--muted-foreground,#5d6973)}
+.pill{font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px;white-space:nowrap}
+.pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.ok{background:var(--ok-bg);color:var(--ok)}
+
+.mock{position:relative;display:flex;min-height:380px;background:#fafbfb;border:1px solid var(--line);border-radius:10px;color:var(--ink)}
+.rail{width:52px;flex:none;background:var(--panel);border-right:1px solid var(--line);border-radius:10px 0 0 10px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0}
+.rb{width:34px;height:34px;border-radius:5px;display:grid;place-items:center;color:#2a343c}
+.hr{width:30px;height:1px;background:var(--line);margin:2px 0}
+.fw{position:relative}
+.chip{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;background:#fff;border:1px solid var(--line);position:relative;letter-spacing:-.01em}
+.chip.l3{font-size:10px}
+.chip:hover{border-color:#8b959d}
+.chip.on{box-shadow:0 0 0 2px var(--blue)}
+.chip.plain.on{background:var(--soft);border-color:var(--blue);color:var(--blue-d);box-shadow:none}
+.chip.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.chip small{position:absolute;bottom:-3px;right:-4px;background:var(--panel);border-radius:6px;font-size:9px;font-weight:600;color:var(--m2);padding:0 3px;line-height:12px}
+.fly{position:absolute;left:100%;top:-6px;padding-left:12px;z-index:5}
+.flybox{background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(20,35,50,.18);width:172px;padding:6px}
+.flybox h4{margin:0;padding:4px 8px 6px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--m2);overflow-wrap:anywhere}
+.pg{display:block;width:100%;text-align:left;padding:6px 8px;border-radius:4px;font-size:13px}
+.pg:hover{background:#eef1f3}
+.pg.on{background:var(--soft);font-weight:700}
+.canvas{flex:1;min-width:0;display:flex;flex-direction:column}
+.chead{padding:11px 12px;border-bottom:1px solid var(--line);background:#fff;font-size:13px;border-radius:0 10px 0 0;overflow-wrap:anywhere}
+.chead span{color:var(--m2)}
+.ph{flex:1;margin:10px;border:1px solid var(--line);border-radius:6px;background:#fff}
+
+.rec{border-left:3px solid var(--blue);padding:2px 0 2px 14px;max-width:80ch}
+.rec p{margin:0 0 8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Option B: telling group chips apart when names clash</h1>
+  <p class="sub">Edit the groups below and all four rails update. Try adding "Risk Reporting" or renaming a group to "Admin Tools". Click a chip to open its pages. <a href="./">Back to all four sidebar options</a></p>
+</header>
+
+<section class="card" aria-labelledby="gh">
+  <h2 id="gh">Groups in this report</h2>
+  <p>"Rail label" and "Icon" only affect rail 2. Leave them empty to use the automatic label.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Group name</th><th>Rail label</th><th>Icon</th><th>Rail 2 shows</th><th><span hidden>Remove</span></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <button class="addg" id="add">+ Add group</button>
+</section>
+
+<section class="cols" id="cols" aria-label="Rail comparisons"></section>
+
+<section class="rec">
+  <h2>Recommendation</h2>
+  <p>Combine 1 and 2. When someone creates a group, generate a unique label for it and save it with the group, so it never changes when other groups are added or reordered. Let people change the label or pick an icon from the group's menu, and warn them if their label is already used.</p>
+  <p>Colour (rail 3) works as an extra cue on top of that, but not as the only difference between two chips, since some people can't tell the colours apart.</p>
+</section>
+</main>
+
+<script>
+const ICONS={
+ panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M16 10l-2 2 2 2"/>',
+ pages:'<path d="M8 3h9l3 3v11H8z"/><path d="M8 7H4v14h12v-4"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ chart:'<path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+ table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
+ flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>',
+ folder:'<path d="M3 6h6l2 2h10v11H3z"/>',
+ bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'
+};
+const ICON_CHOICES=['chart','shield','gear','table','flag','folder','bolt','globe'];
+const ic=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
+const COLORS=[['#2560a3','#dce8f6'],['#18786a','#d5efe9'],['#965a09','#f8e8cf'],['#6c40a6','#ebe1f6'],['#a63d61','#f7dde6'],['#46545f','#e1e6ea']];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let uid=0;
+const G=[
+ {n:'Analytics',p:['Positions','Exposures']},
+ {n:'Admin',p:['Reports'],icon:'gear'},
+ {n:'Analysis',p:['Scenarios','Attribution']},
+ {n:'Risk Metrics',p:['VaR','Greeks']},
+ {n:'Risk Monitoring',p:['Breaches','Limits'],custom:'Mon'},
+ {n:'Market Data',p:['Curves','FX Rates']}
+].map(g=>({id:++uid,custom:'',icon:'',...g}));
+const LOOSE=['Overview'];
+const st={open:null,gid:G[0].id,page:'Positions'};
+
+const STOP=new Set(['and','of','the','for']);
+const sig=n=>(n||'').replace(/[^\p{L}\p{N}\s\-\/&_]/gu,'').split(/[\s\-\/&_]+/).filter(w=>w&&!STOP.has(w.toLowerCase()));
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+function baseOf(w){
+  if(!w.length) return '?';
+  if(w.length>=2) return (w[0][0]+w[1][0]).toUpperCase();
+  return w[0][0].toUpperCase()+(w[0][1]||'').toLowerCase();
+}
+const firstDiff=(a,b)=>{let i=0;while(i<a.length&&i<b.length&&a[i]===b[i])i++;return i};
+const isCons=c=>/[a-z]/.test(c)&&!'aeiou'.includes(c);
+
+/* Unique labels, picked in list order. A clash gets the first letter that tells the two names apart. */
+function autoLabels(list,taken){
+  const out=new Map(),assigned=[];
+  for(const g of list){
+    const w=sig(g.n),base=baseOf(w),c=[base];
+    if(w.length){
+      const multi=w.length>=2,word=(multi?w[1]:w[0]).toLowerCase(),start=multi?1:2;
+      const holder=assigned.find(a=>a.label.toLowerCase()===base.toLowerCase());
+      if(holder){
+        const hw=sig(holder.n),other=((multi?hw[1]:hw[0])||'').toLowerCase(),d=firstDiff(word,other);
+        if(d>=start&&d<word.length) c.push(base+word[d]);
+      }
+      for(let i=start;i<word.length;i++) if(isCons(word[i])) c.push(base+word[i]);
+      for(let i=start;i<word.length;i++) c.push(base+word[i]);
+    }
+    for(let k=2;k<10;k++) c.push(base+k);
+    const pick=c.find(x=>!taken.has(x.toLowerCase()))||base;
+    taken.add(pick.toLowerCase());out.set(g.id,pick);assigned.push({n:g.n,label:pick});
+  }
+  return out;
+}
+function dupes(keys){const m={};keys.forEach(k=>m[k]=(m[k]||0)+1);return m}
+
+function compute(){
+  const R=[];
+  /* 0: today */
+  const t=G.map(g=>cap(g.n.trim().slice(0,2))||'?'),tc=dupes(t.map(s=>s.toLowerCase()));
+  const r0=G.map((g,i)=>({g,label:t[i],bad:tc[t[i].toLowerCase()]>1}));
+  const n0=r0.filter(r=>r.bad).length;
+  R.push({title:'Today: first two letters',pill:n0?['bad',`${n0} chips clash`]:['ok','No clashes'],
+    note:'Groups that start with the same letters get identical chips, so the only way to tell them apart is to open each one.',chips:r0});
+  /* 1: unique auto */
+  const a=autoLabels(G,new Set());
+  R.push({title:'1. Unique automatic labels',pill:['ok','No clashes'],
+    note:'Multi-word names use their initials. A clash adds the first letter that tells the two names apart (An and Ans). Labels are picked in list order, so save each one when its group is created or they can shift as groups are added.',
+    chips:G.map(g=>({g,label:a.get(g.id)}))});
+  /* 2: custom label or icon */
+  const cust=G.filter(g=>!g.icon&&g.custom.trim()),cc=dupes(cust.map(g=>g.custom.trim().toLowerCase()));
+  const taken=new Set(cust.map(g=>g.custom.trim().toLowerCase()));
+  const a2=autoLabels(G.filter(g=>!g.icon&&!g.custom.trim()),taken);
+  const r2=G.map(g=>g.icon?{g,icon:g.icon}:g.custom.trim()?{g,label:g.custom.trim(),bad:cc[g.custom.trim().toLowerCase()]>1,custom:true}:{g,label:a2.get(g.id)});
+  const n2=r2.filter(r=>r.bad).length;
+  R.push({title:'2. Custom label or icon',pill:n2?['bad',`${n2} chips clash`]:['ok','No clashes'],
+    note:'People set a short label or pick an icon in the group\'s menu, and every other group falls back to option 1. Admin uses an icon and Risk Monitoring a custom label here.',chips:r2});
+  /* 3: colour + letter */
+  const r3=G.map((g,i)=>({g,label:((sig(g.n)[0]||'?')[0]).toUpperCase(),col:i%COLORS.length}));
+  const k3=dupes(r3.map(r=>r.label+'|'+r.col)),l3=dupes(r3.map(r=>r.label));
+  r3.forEach(r=>r.bad=k3[r.label+'|'+r.col]>1);
+  const n3=r3.filter(r=>r.bad).length,s3=r3.filter(r=>l3[r.label]>1).length;
+  R.push({title:'3. Colour and one letter',pill:n3?['bad',`${n3} chips clash`]:s3?['warn',`${s3} chips share a letter`]:['ok','No clashes'],
+    note:'Each group gets a colour, so groups can share a letter. Colour alone fails for colour-blind users and after six groups, so treat it as an extra cue on top of 1 or 2.',chips:r3});
+  return {R,rail2:r2};
+}
+
+function chipHTML(ci,c){
+  const g=c.g,on=st.gid===g.id,open=st.open&&st.open.col===ci&&st.open.gid===g.id;
+  let style='',cls='chip';
+  if(c.col!==undefined&&!c.bad){const [fg,bg]=COLORS[c.col];style=`style="color:${fg};background:${bg};border-color:${fg}55"`}
+  else cls+=' plain';
+  if(c.bad) cls+=' bad';
+  if(on) cls+=' on';
+  if(c.label&&c.label.length>2) cls+=' l3';
+  const inner=c.icon?ic(c.icon):esc(c.label);
+  return `<div class="fw"><button class="${cls}" ${style} data-chip data-col="${ci}" data-gid="${g.id}" aria-label="${esc(g.n||'Untitled group')}" aria-expanded="${!!open}" title="${esc(g.n)}">${inner}<small>${g.p.length}</small></button>
+  ${open?`<div class="fly"><div class="flybox"><h4>${esc(g.n||'Untitled group')}</h4>${g.p.map(p=>`<button class="pg ${on&&st.page===p?'on':''}" data-go data-gid="${g.id}" data-p="${esc(p)}">${esc(p)}</button>`).join('')}</div></div>`:''}</div>`;
+}
+function looseHTML(ci){
+  const on=st.gid===null,open=st.open&&st.open.col===ci&&st.open.gid===0;
+  return `<div class="fw"><button class="chip plain ${on?'on':''}" data-chip data-col="${ci}" data-gid="0" aria-label="Ungrouped pages" aria-expanded="${!!open}" title="Ungrouped pages">${ic('pages')}<small>${LOOSE.length}</small></button>
+  ${open?`<div class="fly"><div class="flybox"><h4>Ungrouped pages</h4>${LOOSE.map(p=>`<button class="pg ${on&&st.page===p?'on':''}" data-go data-gid="0" data-p="${esc(p)}">${esc(p)}</button>`).join('')}</div></div>`:''}</div>`;
+}
+
+function renderRails(){
+  const {R,rail2}=compute(),cur=G.find(g=>g.id===st.gid);
+  const crumb=cur?`<span>${esc(cur.n)} /</span> <b>${esc(st.page)}</b>`:`<b>${esc(st.page)}</b>`;
+  document.getElementById('cols').innerHTML=R.map((r,ci)=>`<div class="col">
+    <h3>${r.title}<span class="pill ${r.pill[0]}">${r.pill[1]}</span></h3>
+    <div class="mock"><nav class="rail"><span class="rb">${ic('panel')}</span><div class="hr"></div>${looseHTML(ci)}${r.chips.map(c=>chipHTML(ci,c)).join('')}<span class="rb">${ic('plus')}</span></nav>
+    <div class="canvas"><div class="chead">${crumb}</div><div class="ph"></div></div></div>
+    <p>${r.note}</p></div>`).join('');
+  rail2.forEach(c=>{
+    const row=document.querySelector(`tr[data-id="${c.g.id}"]`);if(!row)return;
+    row.querySelector('[data-f="custom"]').placeholder=c.icon?'':(c.custom?'':c.label);
+    row.querySelector('[data-f="custom"]').disabled=!!c.g.icon;
+    row.querySelector('.st').innerHTML=c.bad?`<span class="warn">Already used by another group</span>`:c.icon?'Icon':c.custom?`Your label: <b>${esc(c.label)}</b>`:`Automatic: <b>${esc(c.label)}</b>`;
+  });
+}
+
+function renderRows(){
+  document.getElementById('rows').innerHTML=G.map(g=>`<tr data-id="${g.id}">
+    <td><input data-f="n" value="${esc(g.n)}" aria-label="Group name" id="n${g.id}"></td>
+    <td class="lab"><input data-f="custom" value="${esc(g.custom)}" maxlength="3" aria-label="Rail label for ${esc(g.n)}" id="c${g.id}"></td>
+    <td class="icn"><select data-f="icon" aria-label="Icon for ${esc(g.n)}" id="i${g.id}"><option value="">None</option>${ICON_CHOICES.map(n=>`<option value="${n}" ${g.icon===n?'selected':''}>${cap(n)}</option>`).join('')}</select></td>
+    <td class="st"></td>
+    <td class="x"><button class="rm" data-rm="${g.id}" aria-label="Remove ${esc(g.n)}">${ic('x')}</button></td></tr>`).join('');
+  renderRails();
+}
+
+document.getElementById('rows').addEventListener('input',e=>{
+  const f=e.target.dataset.f;if(!f)return;
+  const g=G.find(x=>x.id===+e.target.closest('tr').dataset.id);g[f]=e.target.value;renderRails();
+});
+document.getElementById('add').addEventListener('click',()=>{
+  G.push({id:++uid,n:'Risk Reporting',p:['Daily Pack'],custom:'',icon:''});renderRows();
+  document.getElementById('n'+uid).select();
+});
+document.addEventListener('click',e=>{
+  const rm=e.target.closest('[data-rm]');
+  if(rm){const i=G.findIndex(g=>g.id===+rm.dataset.rm);if(st.gid===G[i].id){st.gid=null;st.page=LOOSE[0]}G.splice(i,1);st.open=null;renderRows();return}
+  const chip=e.target.closest('[data-chip]'),go=e.target.closest('[data-go]');
+  if(chip){const col=+chip.dataset.col,gid=+chip.dataset.gid;st.open=st.open&&st.open.col===col&&st.open.gid===gid?null:{col,gid}}
+  else if(go){const gid=+go.dataset.gid;st.gid=gid||null;st.page=go.dataset.p;st.open=null}
+  else if(e.target.closest('.flybox')) return;
+  else if(!st.open) return;
+  else st.open=null;
+  renderRails();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&st.open){st.open=null;renderRails()}});
+renderRows();
+</script>
+</body>
+</html>
